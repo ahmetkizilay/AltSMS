@@ -17,12 +17,23 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.ahmetkizilay.alt.sms.ListMessagesActivity"
+            android:name="com.ahmetkizilay.alt.sms.ListThreadsActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        <activity
+            android:name="com.ahmetkizilay.alt.sms.ListMessagesActivity"
+            android:parentActivityName="com.ahmetkizilay.alt.sms.ListThreadsActivity"
+            android:label="Messages in this thread">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="com.ahmetkizilay.alt.sms.ListMessages" />
             </intent-filter>
         </activity>
     </application>

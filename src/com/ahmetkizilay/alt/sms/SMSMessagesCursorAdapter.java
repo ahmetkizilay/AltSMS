@@ -12,25 +12,28 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class SMSThreadCursorAdapter extends CursorAdapter{
+public class SMSMessagesCursorAdapter extends CursorAdapter{
 
+	private int idIndex;
+	private int personIndex;
 	private int addressIndex;
 	private int bodyIndex;
-	private int countIndex;
-	private int personIndex;
-	private int threadIdIndex;
+	private int typeIndex;
+	private int dateIndex;
 	
 	private Activity activity;
 	
-	public SMSThreadCursorAdapter(Activity activity, Cursor cursor) {
+	public SMSMessagesCursorAdapter(Activity activity, Cursor cursor) {
 		super(activity, cursor, false);
 		
 		this.activity = activity;
+		
+		this.idIndex = cursor.getColumnIndex("_id");
+		this.personIndex = cursor.getColumnIndex("person");
 		this.addressIndex = cursor.getColumnIndex("address");
 		this.bodyIndex = cursor.getColumnIndex("body");
-		this.countIndex = cursor.getColumnIndex("count");
-		this.personIndex = cursor.getColumnIndex("person");
-		this.threadIdIndex = cursor.getColumnIndex("thread_id");
+		this.typeIndex = cursor.getColumnIndex("type");
+		this.dateIndex = cursor.getColumnIndex("date");
 	}
 
 	@Override
@@ -40,22 +43,22 @@ public class SMSThreadCursorAdapter extends CursorAdapter{
 		String contactId = cursor.getString(this.personIndex);
 		String sender = contactId != null ? this.getContactName(Integer.parseInt(contactId)) : cursor.getString(this.addressIndex);
 		
+		String htmlSource = "<p><b>" + sender + ":</b>&nbsp;" + cursor.getString(this.bodyIndex) + "</p>";
+	
+		holder.body.setText(Html.fromHtml(htmlSource));
 		holder.photo.setImageResource(R.drawable.ic_launcher);
-		holder.sender.setText(Html.fromHtml("<p><b>" + sender + "</b>&nbsp;(" + cursor.getInt(this.countIndex) + ")</p>"));
-		holder.body.setText(cursor.getString(this.bodyIndex));
 	}
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
 			LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-			View rowView = inflater.inflate(R.layout.altsms_display_list_item, null);
+			View rowView = inflater.inflate(R.layout.altsms_message_list_item, null);
 			
 			ViewHolder viewHolder = new ViewHolder();
 			viewHolder.body = (TextView) rowView.findViewById(R.id.lblBody);
-			viewHolder.sender = (TextView) rowView.findViewById(R.id.lblSender);
 			viewHolder.photo = (ImageView) rowView.findViewById(R.id.imgPhoto);
-			viewHolder.threadId = cursor.getInt(this.threadIdIndex);
+			viewHolder.smsId = cursor.getInt(this.idIndex);
 			rowView.setTag(viewHolder);
 		
 			return rowView;
@@ -81,8 +84,7 @@ public class SMSThreadCursorAdapter extends CursorAdapter{
 
 	static class ViewHolder {
 		public TextView body;
-		public TextView sender;
 		public ImageView photo;
-		public int threadId;
+		public int smsId;
 	}
 }

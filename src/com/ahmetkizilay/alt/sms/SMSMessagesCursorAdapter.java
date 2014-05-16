@@ -1,6 +1,7 @@
 package com.ahmetkizilay.alt.sms;
 
 import com.ahmetkizilay.alt.sms.ContactsUtils.ContactHolder;
+import com.ahmetkizilay.alt.sms.SMSThreadCursorAdapter.ViewHolder;
 
 import android.app.Activity;
 import android.content.Context;
@@ -42,12 +43,20 @@ public class SMSMessagesCursorAdapter extends CursorAdapter{
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 		
+		String phoneNumber = cursor.getString(this.addressIndex);
 		ViewHolder holder = (ViewHolder) view.getTag();
-		ContactHolder cHolder = this.contactUtils.findContactByPhoneNumber(cursor.getString(this.addressIndex));		
-		String htmlSource = "<p><b>" + cHolder.username + ":</b>&nbsp;" + cursor.getString(this.bodyIndex) + "</p>";
-	
+		ContactHolder cHolder = this.contactUtils.findContactByPhoneNumber(phoneNumber);
+		
+		String htmlSource = cHolder.isContact ? "<b>" + cHolder.username + ":</b>" : "<b>" + phoneNumber + ":</b>";
+		htmlSource += "&nbsp;" + cursor.getString(this.bodyIndex);
 		holder.body.setText(Html.fromHtml(htmlSource));
-		holder.photo.setImageBitmap(this.contactUtils.fetchThumbnail(this.contactUtils.fetchThumbnailId(cursor.getString(this.addressIndex))));
+		
+		if(cHolder.isContact && cHolder.photoId != 0) {
+			holder.photo.setImageBitmap(this.contactUtils.fetchThumbnail(cHolder.photoId));
+		}
+		else {
+			holder.photo.setImageResource(R.drawable.ic_launcher);
+		}
 	}
 
 	@Override
@@ -60,6 +69,7 @@ public class SMSMessagesCursorAdapter extends CursorAdapter{
 			viewHolder.body = (TextView) rowView.findViewById(R.id.lblBody);
 			viewHolder.photo = (ImageView) rowView.findViewById(R.id.imgPhoto);
 			viewHolder.smsId = cursor.getInt(this.idIndex);
+			viewHolder.address = cursor.getString(this.addressIndex);
 			rowView.setTag(viewHolder);
 		
 			return rowView;
@@ -70,5 +80,6 @@ public class SMSMessagesCursorAdapter extends CursorAdapter{
 		public TextView body;
 		public ImageView photo;
 		public int smsId;
+		public String address;
 	}
 }

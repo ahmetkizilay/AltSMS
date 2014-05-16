@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,12 +44,26 @@ public class SMSThreadCursorAdapter extends CursorAdapter{
 
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
-		
+		String phoneNumber = cursor.getString(this.addressIndex);
+		int messageCount = cursor.getInt(this.countIndex);
 		ViewHolder holder = (ViewHolder) view.getTag();
-		ContactHolder cHolder = this.contactUtils.findContactByPhoneNumber(cursor.getString(this.addressIndex));
+		ContactHolder cHolder = this.contactUtils.findContactByPhoneNumber(phoneNumber);
 		
-		holder.photo.setImageBitmap(this.contactUtils.fetchThumbnail(cHolder.photoId));
-		holder.sender.setText(Html.fromHtml("<p><b>" + cHolder.username + "</b>&nbsp;(" + cursor.getInt(this.countIndex) + ")</p>"));
+		if(cHolder.isContact && cHolder.photoId != 0) {
+			holder.photo.setImageBitmap(this.contactUtils.fetchThumbnail(cHolder.photoId));
+		}
+		else {
+			holder.photo.setImageResource(R.drawable.ic_launcher);
+		}
+		
+		if(cHolder.isContact) {
+			holder.sender.setText(Html.fromHtml("<b>" + cHolder.username + "</b>&nbsp;(" + messageCount + ")"));
+		}
+		else {
+			holder.sender.setText(Html.fromHtml("<b>" + phoneNumber + "</b>&nbsp;(" + messageCount + ")"));
+		}
+		
+
 		holder.body.setText(cursor.getString(this.bodyIndex));
 	}
 

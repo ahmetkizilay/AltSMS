@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ListView;
 
 public class ListMessagesActivity extends Activity {
@@ -16,7 +17,7 @@ public class ListMessagesActivity extends Activity {
 		
 		Intent intent = getIntent();
 		int threadId = intent.getIntExtra("thread_id", -1);
-
+		
 		SMSMediator smsMediator = new SMSMediator(this);
 		Cursor smsCursor = smsMediator.getAllSmsByThreadId(threadId);
 		

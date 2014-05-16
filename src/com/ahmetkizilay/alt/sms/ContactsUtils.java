@@ -72,6 +72,7 @@ public class ContactsUtils {
         if(cursor.moveToFirst()) {
         	cHolder.username = cursor.getString(cursor.getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
         	cHolder.photoId = cursor.getInt(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_ID));
+        	cHolder.isContact = true;
         }
 
         cursor.close();
@@ -80,7 +81,8 @@ public class ContactsUtils {
 	}
 	
 	public static class ContactHolder {
-		public String username;
-		public int photoId;
+		public String username = "";
+		public int photoId = -1;
+		public boolean isContact = false;
 	}
 }

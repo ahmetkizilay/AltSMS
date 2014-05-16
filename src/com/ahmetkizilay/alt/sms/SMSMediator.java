@@ -7,7 +7,6 @@ import android.net.Uri;
 public class SMSMediator {
 	private final static Uri SMS_CONTENT_URI = Uri.parse("content://sms");
 	
-
 	private Context context;
 	
 	public SMSMediator(Context context) {

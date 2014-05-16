@@ -1,8 +1,13 @@
 package com.ahmetkizilay.alt.sms;
 
+
+import com.ahmetkizilay.alt.sms.ContactsUtils.ContactHolder;
+
 import android.app.Activity;
+
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.provider.ContactsContract;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -21,6 +26,7 @@ public class SMSThreadCursorAdapter extends CursorAdapter{
 	private int threadIdIndex;
 	
 	private Activity activity;
+	private ContactsUtils contactUtils;
 	
 	public SMSThreadCursorAdapter(Activity activity, Cursor cursor) {
 		super(activity, cursor, false);
@@ -31,17 +37,18 @@ public class SMSThreadCursorAdapter extends CursorAdapter{
 		this.countIndex = cursor.getColumnIndex("count");
 		this.personIndex = cursor.getColumnIndex("person");
 		this.threadIdIndex = cursor.getColumnIndex("thread_id");
+		
+		this.contactUtils = new ContactsUtils(this.activity);
 	}
 
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 		
 		ViewHolder holder = (ViewHolder) view.getTag();
-		String contactId = cursor.getString(this.personIndex);
-		String sender = contactId != null ? this.getContactName(Integer.parseInt(contactId)) : cursor.getString(this.addressIndex);
+		ContactHolder cHolder = this.contactUtils.findContactByPhoneNumber(cursor.getString(this.addressIndex));
 		
-		holder.photo.setImageResource(R.drawable.ic_launcher);
-		holder.sender.setText(Html.fromHtml("<p><b>" + sender + "</b>&nbsp;(" + cursor.getInt(this.countIndex) + ")</p>"));
+		holder.photo.setImageBitmap(this.contactUtils.fetchThumbnail(cHolder.photoId));
+		holder.sender.setText(Html.fromHtml("<p><b>" + cHolder.username + "</b>&nbsp;(" + cursor.getInt(this.countIndex) + ")</p>"));
 		holder.body.setText(cursor.getString(this.bodyIndex));
 	}
 
@@ -49,7 +56,7 @@ public class SMSThreadCursorAdapter extends CursorAdapter{
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
 			LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-			View rowView = inflater.inflate(R.layout.altsms_display_list_item, null);
+			View rowView = inflater.inflate(R.layout.altsms_thread_list_item, null);
 			
 			ViewHolder viewHolder = new ViewHolder();
 			viewHolder.body = (TextView) rowView.findViewById(R.id.lblBody);
@@ -62,23 +69,6 @@ public class SMSThreadCursorAdapter extends CursorAdapter{
 
 	}
 	
-	private String getContactName(int contactId) {
-		final Cursor cursor = this.activity.getContentResolver().query(
-				ContactsContract.Contacts.CONTENT_URI,
-				new String[] { ContactsContract.Contacts.DISPLAY_NAME },
-				"_id = " + contactId,
-                null, null);
-
-        String userName = "";
-        if(cursor.moveToFirst()) {
-        	userName = cursor.getString(cursor.getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
-        }
-
-        cursor.close();
-
-        return userName;
-	}
-
 	static class ViewHolder {
 		public TextView body;
 		public TextView sender;

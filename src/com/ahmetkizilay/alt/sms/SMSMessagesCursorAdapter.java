@@ -1,9 +1,10 @@
 package com.ahmetkizilay.alt.sms;
 
+import com.ahmetkizilay.alt.sms.ContactsUtils.ContactHolder;
+
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
-import android.provider.ContactsContract;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,11 +23,13 @@ public class SMSMessagesCursorAdapter extends CursorAdapter{
 	private int dateIndex;
 	
 	private Activity activity;
+	private ContactsUtils contactUtils;
 	
 	public SMSMessagesCursorAdapter(Activity activity, Cursor cursor) {
 		super(activity, cursor, false);
 		
 		this.activity = activity;
+		this.contactUtils = new ContactsUtils(this.activity);
 		
 		this.idIndex = cursor.getColumnIndex("_id");
 		this.personIndex = cursor.getColumnIndex("person");
@@ -40,13 +43,11 @@ public class SMSMessagesCursorAdapter extends CursorAdapter{
 	public void bindView(View view, Context context, Cursor cursor) {
 		
 		ViewHolder holder = (ViewHolder) view.getTag();
-		String contactId = cursor.getString(this.personIndex);
-		String sender = contactId != null ? this.getContactName(Integer.parseInt(contactId)) : cursor.getString(this.addressIndex);
-		
-		String htmlSource = "<p><b>" + sender + ":</b>&nbsp;" + cursor.getString(this.bodyIndex) + "</p>";
+		ContactHolder cHolder = this.contactUtils.findContactByPhoneNumber(cursor.getString(this.addressIndex));		
+		String htmlSource = "<p><b>" + cHolder.username + ":</b>&nbsp;" + cursor.getString(this.bodyIndex) + "</p>";
 	
 		holder.body.setText(Html.fromHtml(htmlSource));
-		holder.photo.setImageResource(R.drawable.ic_launcher);
+		holder.photo.setImageBitmap(this.contactUtils.fetchThumbnail(this.contactUtils.fetchThumbnailId(cursor.getString(this.addressIndex))));
 	}
 
 	@Override
@@ -65,23 +66,6 @@ public class SMSMessagesCursorAdapter extends CursorAdapter{
 
 	}
 	
-	private String getContactName(int contactId) {
-		final Cursor cursor = this.activity.getContentResolver().query(
-				ContactsContract.Contacts.CONTENT_URI,
-				new String[] { ContactsContract.Contacts.DISPLAY_NAME },
-				"_id = " + contactId,
-                null, null);
-
-        String userName = "";
-        if(cursor.moveToFirst()) {
-        	userName = cursor.getString(cursor.getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
-        }
-
-        cursor.close();
-
-        return userName;
-	}
-
 	static class ViewHolder {
 		public TextView body;
 		public ImageView photo;

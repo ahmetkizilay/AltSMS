@@ -44,18 +44,25 @@ public class SMSMessagesCursorAdapter extends CursorAdapter{
 	public void bindView(View view, Context context, Cursor cursor) {
 		
 		String phoneNumber = cursor.getString(this.addressIndex);
+		int type = cursor.getInt(this.typeIndex);
 		ViewHolder holder = (ViewHolder) view.getTag();
 		ContactHolder cHolder = this.contactUtils.findContactByPhoneNumber(phoneNumber);
+		String htmlSource = "";
 		
-		String htmlSource = cHolder.isContact ? "<b>" + cHolder.username + ":</b>" : "<b>" + phoneNumber + ":</b>";
+		if(type == 2) {
+			htmlSource = "<b>Me:</b>";
+		}else {
+			htmlSource = cHolder.isContact ? "<b>" + cHolder.username + ":</b>" : "<b>" + phoneNumber + ":</b>";
+		}
+		
 		htmlSource += "&nbsp;" + cursor.getString(this.bodyIndex);
 		holder.body.setText(Html.fromHtml(htmlSource));
 		
-		if(cHolder.isContact && cHolder.photoId != 0) {
+		if(cHolder.isContact && cHolder.photoId != 0 && type != 2) {
 			holder.photo.setImageBitmap(this.contactUtils.fetchThumbnail(cHolder.photoId));
 		}
 		else {
-			holder.photo.setImageResource(R.drawable.ic_launcher);
+			holder.photo.setImageResource(R.drawable.person);
 		}
 	}
 

@@ -65,6 +65,7 @@ public class SMSThreadCursorAdapter extends CursorAdapter{
 		
 
 		holder.body.setText(cursor.getString(this.bodyIndex));
+		holder.threadId = cursor.getInt(this.threadIdIndex);
 	}
 
 	@Override

@@ -17,6 +17,7 @@ public class ContactsUtils {
 			ContactsContract.CommonDataKinds.Photo.PHOTO
 	};
 	
+	
 	private Activity activity;
 	
 	public ContactsUtils(Activity activity) {
@@ -79,7 +80,7 @@ public class ContactsUtils {
 
         return cHolder;
 	}
-	
+		
 	public static class ContactHolder {
 		public String username = "";
 		public int photoId = -1;

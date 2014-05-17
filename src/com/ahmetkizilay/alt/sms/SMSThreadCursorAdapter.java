@@ -53,7 +53,7 @@ public class SMSThreadCursorAdapter extends CursorAdapter{
 			holder.photo.setImageBitmap(this.contactUtils.fetchThumbnail(cHolder.photoId));
 		}
 		else {
-			holder.photo.setImageResource(R.drawable.ic_launcher);
+			holder.photo.setImageResource(R.drawable.person);
 		}
 		
 		if(cHolder.isContact) {
